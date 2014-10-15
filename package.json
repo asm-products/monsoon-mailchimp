@@ -1,0 +1,24 @@
+{
+  "name": "mailchimp-adapter",
+  "version": "0.1.0",
+  "description": "An adapter for processing MailChimp updates through Monsoon (https://monsoon.assembly.com)",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:asm-products/monsoon-mailchimp.git"
+  },
+  "keywords": [
+    "monsoon",
+    "assembly",
+    "mailchimp"
+  ],
+  "author": "chuck@assembly.com",
+  "license": "AGPL",
+  "bugs": {
+    "url": "https://github.com/asm-products/monsoon-mailchimp/issues"
+  },
+  "homepage": "https://github.com/asm-products/monsoon-mailchimp"
+}
