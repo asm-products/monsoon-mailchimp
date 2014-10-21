@@ -1,4 +1,4 @@
-# Monsoon
+# MailChimp Adapter
 
 ## Pluggable API for consuming and reporting activities from anywhere
 
