@@ -25,6 +25,8 @@ activities.route(route)
   var token = req.query.token;
   var body = req.body;
 
+  console.log(body);
+
   var activity = new Activity({
     product: product,
     webhook_id: body.data.id,

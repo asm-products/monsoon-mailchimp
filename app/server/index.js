@@ -14,10 +14,12 @@ var db = require('./db');
 app.set('bookshelf', db);''
 
 // middleware
+
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // routes
 app.use('/', controllers.subscribers);
 app.use('/', controllers.activities);
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 4000);
