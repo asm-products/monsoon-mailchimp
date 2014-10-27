@@ -1,6 +1,7 @@
 var express = require('express');
 var authorization = require('../middleware/authorization');
 var request = require('request');
+var uuid = require('node-uuid');
 var Activity = require('../models/activity');
 var Subscriber = require('../models/subscriber');
 var Update = require('../models/update');
@@ -133,7 +134,8 @@ function countActivitiesSince(product, token, update) {
     update = new Update({
       product: product,
       sent_at: new Date(0),
-      current_count: 0
+      current_count: 0,
+      id: uuid.v4()
     });
   }
 
@@ -148,7 +150,7 @@ function countActivitiesSince(product, token, update) {
 
     if (count >= COUNT) {
       alertProduct(count, product, token, timestamp);
-      
+
       return markUpdate(update, {
         sent_at: now,
         current_count: 0
@@ -167,6 +169,10 @@ function countActivitiesSince(product, token, update) {
 }
 
 function markUpdate(update, data) {
+  if (!data.id) {
+    data.id = uuid.v4();
+  }
+
   update.set(data)
   .save()
   .then(function(u) {
