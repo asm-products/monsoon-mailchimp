@@ -25,8 +25,6 @@ activities.route(route)
   var token = req.query.token;
   var body = req.body;
 
-  console.log(body);
-
   var activity = new Activity({
     product: product,
     webhook_id: body.data.id,
@@ -150,6 +148,7 @@ function countActivitiesSince(product, token, update) {
 
     if (count >= COUNT) {
       alertProduct(count, product, token, timestamp);
+      
       return markUpdate(update, {
         sent_at: now,
         current_count: 0

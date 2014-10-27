@@ -1,19 +1,18 @@
 var bookshelf = require('../db');
 var uuid = require('node-uuid');
 
-var Activity = bookshelf.Model.extend({
+var Update = bookshelf.Model.extend({
   tableName: 'updates',
 
   initialize: function() {
-    this.on('saving', this.setIdAndSentAt, this);
+    this.on('creating', this.setIdAndSentAt, this);
   },
 
   setId: function(model, attrs, options) {
     model.set({
-      id: uuid.v4(),
-      sent_at: Date.now()
+      id: uuid.v4()
     });
   }
 });
 
-module.exports = Activity;
+module.exports = Update;
