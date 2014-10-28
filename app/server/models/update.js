@@ -4,6 +4,12 @@ var uuid = require('node-uuid');
 var Update = bookshelf.Model.extend({
   tableName: 'updates',
 
+  defaults: function() {
+    return {
+      id: uuid.v4()
+    };
+  },
+
   initialize: function() {
     this.on('creating', this.setIdAndSentAt, this);
   },

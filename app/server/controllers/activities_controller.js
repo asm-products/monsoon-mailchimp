@@ -169,12 +169,8 @@ function countActivitiesSince(product, token, update) {
 }
 
 function markUpdate(update, data) {
-  if (!data.id) {
-    data.id = uuid.v4();
-  }
-
   update.set(data)
-  .save()
+  .save({ method: 'update' })
   .then(function(u) {
     console.log('Saved:', u);
   })
