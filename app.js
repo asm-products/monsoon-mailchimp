@@ -28,4 +28,8 @@ app.get('/', function(req, res) {
   });
 });
 
-app.listen(process.env.PORT || 4000);
+var sequelize = require('./models').sequelize;
+
+sequelize.sync().then(function() {
+  app.listen(process.env.PORT || 4000);
+});

@@ -46,7 +46,7 @@ activities.route(route)
 
 function alertProduct(count, product, token, timestamp) {
   // Assembly-only
-  var endpoint = process.env.ASSEMBLY_API + '/' + product + '/activities?token=' + token;
+  var endpoint = process.env.ASSEMBLY_API + '/products/' + product + '/updates?token=' + token;
   var countDays = timestamp > 0 ? Math.floor((Date.now() - timestamp) / ONE_DAY) : 1;
   var days = countDays === 1 ? 'the past day' : 'the past' + countDays + ' days';
   var message = 'There were ' + count + ' new signups in ' + days + '.';
@@ -55,9 +55,7 @@ function alertProduct(count, product, token, timestamp) {
     method: 'POST',
     uri: endpoint,
     body: {
-      news_feed_item: {
-        message: message
-      },
+      message: message,
       user_token: process.env.ASSEMBLY_AUTHENTICATION_TOKEN
     },
     json: true
@@ -86,9 +84,7 @@ function alertSubscribers(count, product, timestamp) {
         method: 'POST',
         uri: endpoint,
         body: {
-          news_feed_item: {
-            message: message
-          },
+          message: message,
           user_token: process.env.ASSEMBLY_AUTHENTICATION_TOKEN
         },
         json: true
@@ -169,7 +165,7 @@ function markUpdate(update, data) {
   update.set(data)
   .save()
   .then(function(u) {
-    console.log('Saved:', u);
+    console.log('Saved.');
   })
   .catch(function(error) {
     console.log('Error marking update', data);
