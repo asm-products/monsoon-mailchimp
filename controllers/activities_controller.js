@@ -35,7 +35,7 @@ activities.route(route)
   })
   .then(function(activity) {
     checkUpdates(product, token);
-    res.status(201).json(a);
+    res.status(201).json(activity);
   })
   .catch(function(err) {
     console.error('Activity failed to save.');
