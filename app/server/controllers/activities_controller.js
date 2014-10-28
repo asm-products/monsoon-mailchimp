@@ -170,7 +170,7 @@ function countActivitiesSince(product, token, update) {
 
 function markUpdate(update, data) {
   update.set(data)
-  .save({ method: 'update' })
+  .save()
   .then(function(u) {
     console.log('Saved:', u);
   })
