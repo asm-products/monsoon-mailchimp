@@ -139,7 +139,7 @@ function countActivitiesSince(product, token, update) {
 
   var timestamp = update.get('sent_at');
 
-  Activity.findAll({ where: { product: product, created_at: { gte: timestampe } } })
+  Activity.findAll({ where: { product: product, created_at: { gte: timestamp } } })
   .then(function(activities) {
     var count = activities.length + update.get('current_count');
     var now = new Date();
