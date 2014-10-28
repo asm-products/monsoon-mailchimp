@@ -1,30 +1,19 @@
-var Update = require('../../app/server/models/update');
+var Update = require('../../models').Update;
 var expect = require('chai').expect;
 
 describe('Update', function() {
   before(function(done) {
-    destroyAll(done);
+    Update.sync().done(done);
   });
-
+  
   after(function(done) {
-    destroyAll(done);
+    Update.drop().done(done);
   });
 
-  it('automatically sets a uuid', function() {
-    new Update().save().then(function(update) {
-      expect(update).to.exist;
-    });
+  it('automatically sets a uuid', function(done) {
+    Update.create({ current_count: 0, sent_at: new Date(0), product: 'test' }).then(function(update) {
+      expect(update.id).not.to.be.undefined;
+      done();
+    }).catch(done);
   });
 });
-
-function destroyAll(done) {
-  Update.fetchAll().then(function(updates) {
-    var count = 0;
-
-    updates.forEach(function(update) {
-      update.destroy();
-    });
-
-    done();
-  });
-}

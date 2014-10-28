@@ -1,7 +1,7 @@
 var express = require('express');
 var authorization = require('../middleware/authorization');
-var Subscriber = require('../models/subscriber');
-var uuid = require('node-uuid');
+var models = require('../models');
+var Subscriber = models.Subscriber;
 
 var subscribers = express.Router();
 var route = '/products/:product/subscribers'
@@ -19,15 +19,14 @@ subscribers.route(route)
   var product = req.params.product;
   var endpoint = req.body.endpoint;
 
-  var subscriber = new Subscriber({
+  var subscriber = Subscriber.create({
     product: product,
     endpoint: endpoint
   })
-  .save()
   .then(function(s) {
     res.status(201).json(s);
   })
-  .otherwise(function(err) {
+  .catch(function(err) {
     console.error('Subscriber failed to save.');
     res.status(400).json(err);
   });

@@ -1,10 +1,10 @@
 var express = require('express');
 var authorization = require('../middleware/authorization');
 var request = require('request');
-var uuid = require('node-uuid');
-var Activity = require('../models/activity');
-var Subscriber = require('../models/subscriber');
-var Update = require('../models/update');
+var models = require('../models');
+var Activity = models.Activity;
+var Subscriber = models.Subscriber;
+var Update = models.Update;
 
 var activities = express.Router();
 var route = '/products/:product/activities';
@@ -26,19 +26,18 @@ activities.route(route)
   var token = req.query.token;
   var body = req.body;
 
-  var activity = new Activity({
+  Activity.create({
     product: product,
     webhook_id: body.data.id,
     type: body.data.email_type,
     list_id: body.data.list_id,
     email: body.data.email
   })
-  .save()
-  .then(function(a) {
+  .then(function(activity) {
     checkUpdates(product, token);
     res.status(201).json(a);
   })
-  .otherwise(function(err) {
+  .catch(function(err) {
     console.error('Activity failed to save.');
     res.status(400).json(err);
   });
@@ -63,9 +62,10 @@ function alertProduct(count, product, token, timestamp) {
     json: true
   }, function(err, response, body) {
     if (err) {
-      console.log('Error sending message to ' + endpoint);
+      return console.log('Error sending message to ' + endpoint);
     }
 
+    console.log(response.statusCode);
     console.log(body);
   });
 
@@ -73,8 +73,7 @@ function alertProduct(count, product, token, timestamp) {
 }
 
 function alertSubscribers(count, product, timestamp) {
-  Subscriber.where({ product: product })
-  .fetchAll()
+  Subscriber.findAll({ where: { product: product } })
   .then(function(subscribers) {
     subscribers.forEach(function(subscriber) {
       var endpoint = subscriber.get('endpoint');
@@ -94,22 +93,22 @@ function alertSubscribers(count, product, timestamp) {
         json: true
       }, function(err, response, body) {
         if (err) {
-          console.log('Error sending message to ' + endpoint);
+          return console.log('Error sending message to ' + endpoint);
         }
 
+        console.log(response.statusCode);
         console.log(body);
       });
     });
   })
-  .otherwise(function(error) {
+  .catch(function(error) {
     console.log('Error fetching subscribers.');
     console.error(error);
   });
 }
 
 function checkUpdates(product, token) {
-  Update.where({ product: product })
-  .fetch()
+  Update.find({ product: product })
   .then(function(update) {
     var now = Date.now();
 
@@ -123,7 +122,7 @@ function checkUpdates(product, token) {
       countActivitiesSince(product, token, update);
     }
   })
-  .otherwise(function(error) {
+  .catch(function(error) {
     console.log('Error fetching update for ' + product);
     console.error(error);
   });
@@ -131,19 +130,16 @@ function checkUpdates(product, token) {
 
 function countActivitiesSince(product, token, update) {
   if (!update) {
-    update = new Update({
+    update = Update.build({
       product: product,
       sent_at: new Date(0),
-      current_count: 0,
-      id: uuid.v4()
+      current_count: 0
     });
   }
 
   var timestamp = update.get('sent_at');
 
-  Activity.where({ product: product })
-  .query('where', 'created_at', '>=', timestamp)
-  .fetchAll()
+  Activity.findAll({ where: { product: product, created_at: { gte: timestampe } } })
   .then(function(activities) {
     var count = activities.length + update.get('current_count');
     var now = new Date();
@@ -162,7 +158,7 @@ function countActivitiesSince(product, token, update) {
       current_count: count
     });
   })
-  .otherwise(function(error) {
+  .catch(function(error) {
     console.log('Error counting activities');
     console.error(error);
   });
@@ -174,10 +170,10 @@ function markUpdate(update, data) {
   .then(function(u) {
     console.log('Saved:', u);
   })
-  .otherwise(function(error) {
+  .catch(function(error) {
     console.log('Error marking update', data);
     console.error(error);
-  })
+  });
 }
 
 module.exports = activities;
