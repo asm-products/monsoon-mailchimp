@@ -39,6 +39,7 @@ activities.route(route)
   })
   .catch(function(err) {
     console.error('Activity failed to save.');
+    console.log(err);
     res.status(400).json(err);
   });
 });
