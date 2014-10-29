@@ -12,7 +12,7 @@ module.exports = function(req, res, next) {
     }
   }, function(error, response, body) {
     if (error) {
-      return res.status(500).json(error);
+      return res.send(error);
     }
 
     var authorized, body;
@@ -20,7 +20,7 @@ module.exports = function(req, res, next) {
       body = JSON.parse(response.body);
       authorized = body.authorized;
     } catch (e) {
-      res.status(500).send(e);
+      res.send(e);
     }
 
     if (!authorized) {

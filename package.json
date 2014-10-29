@@ -18,7 +18,7 @@
     "mailchimp"
   ],
   "author": "chuck@assembly.com",
-  "license": "AGPL",
+  "license": "AGPLv3",
   "bugs": {
     "url": "https://github.com/asm-products/monsoon-mailchimp/issues"
   },
@@ -28,7 +28,6 @@
   "homepage": "https://github.com/asm-products/monsoon-mailchimp",
   "dependencies": {
     "body-parser": "^1.9.0",
-    "bookshelf": "^0.7.7",
     "dotenv": "^0.4.0",
     "express": "^4.9.7",
     "mime-db": "^1.1.0",
