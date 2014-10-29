@@ -24,7 +24,7 @@ module.exports = function(req, res, next) {
     }
 
     if (!authorized) {
-      return res.status(401).json(body);
+      return res.json(body);
     }
 
     next();
