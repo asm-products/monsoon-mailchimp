@@ -11,6 +11,20 @@ var route = '/products/:product/activities';
 
 var COUNT = 10;
 var ONE_DAY = 24 * 60 * 60 * 1000;
+var MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+];
 
 activities.use(route, authorization);
 
@@ -47,9 +61,11 @@ activities.route(route)
 function alertProduct(count, product, token, timestamp) {
   // Assembly-only
   var endpoint = process.env.ASSEMBLY_API + '/products/' + product + '/updates?token=' + token;
-  var countDays = timestamp > 0 ? Math.floor((Date.now() - timestamp) / ONE_DAY) : 1;
-  var days = countDays === 1 ? 'the past day' : 'the past' + countDays + ' days';
-  var message = 'There were ' + count + ' new signups in ' + days + '.';
+  var date = new Date(timestamp);
+  var month = MONTHS[date.getMonth()];
+  var day = date.getDate();
+  var since = month + ' ' + date;
+  var message = 'There were ' + count + ' new signups since ' + since + '.';
 
   request({
     method: 'POST',
@@ -77,7 +93,7 @@ function alertSubscribers(count, product, timestamp) {
     subscribers.forEach(function(subscriber) {
       var endpoint = subscriber.get('endpoint');
       var countDays = timestamp > 0 ? Math.floor((Date.now() - timestamp) / ONE_DAY) : 1;
-      var days = countDays === 1 ? 'the past day' : 'the past' + countDays + ' days';
+      var days = countDays === 1 ? 'the past day' : 'the past ' + countDays + ' days';
       var message = 'There were ' + count + ' new signups in ' + days + '.';
 
       request({
