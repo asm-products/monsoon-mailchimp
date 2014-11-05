@@ -60,31 +60,38 @@ activities.route(route)
 
 function alertProduct(count, product, token, timestamp) {
   // Assembly-only
-  var endpoint = process.env.ASSEMBLY_API + '/products/' + product + '/updates?token=' + token;
-  var date = new Date(timestamp);
-  var month = MONTHS[date.getMonth()];
-  var day = date.getDate();
-  var since = month + ' ' + day;
-  var message = 'There were ' + count + ' new signups since ' + since + '.';
 
-  request({
-    method: 'POST',
-    uri: endpoint,
-    body: {
-      message: message,
-      user_token: process.env.ASSEMBLY_AUTHENTICATION_TOKEN
-    },
-    json: true
-  }, function(err, response, body) {
+  getTotalSubscribers(function(err, total) {
     if (err) {
-      return console.log('Error sending message to ' + endpoint);
+      console.log(err);
+      return console.error('Error getting total subscirbers.');
     }
 
-    console.log(response.statusCode);
-    console.log(body);
-  });
+    var endpoint = process.env.ASSEMBLY_API + '/products/' + product + '/updates?token=' + token;
+    var date = new Date(timestamp);
+    var month = MONTHS[date.getMonth()];
+    var day = date.getDate();
+    var since = month + ' ' + day;
+    var message = 'There were ' + count + ' new signups since ' + since +
+      '. There are now ' + total + ' subscribers.';
 
-  alertSubscribers(count, product, timestamp);
+    request({
+      method: 'POST',
+      uri: endpoint,
+      body: {
+        message: message,
+        user_token: process.env.ASSEMBLY_AUTHENTICATION_TOKEN
+      },
+      json: true
+    }, function(err, response, body) {
+      if (err) {
+        return console.log('Error sending message to ' + endpoint);
+      }
+
+      console.log(response.statusCode);
+      console.log(body);
+    });
+  });
 }
 
 function alertSubscribers(count, product, timestamp) {
@@ -186,6 +193,42 @@ function markUpdate(update, data) {
   .catch(function(error) {
     console.log('Error marking update', data);
     console.error(error);
+  });
+}
+
+function getTotalSubscribers(callback) {
+  var uri = process.env.MAILCHIMP_API;
+  var key = process.env.MAILCHIMP_API_KEY;
+
+  request({
+    method: 'POST',
+    uri: uri + '/lists/list',
+    json: true,
+    body: {
+      apikey: key
+    }
+  }, function(err, response, body) {
+    if (err) {
+      return callback(err);
+    }
+
+    var listId = body.data[0].id;
+
+    request({
+      method: 'POST',
+      uri: uri + '/lists/members',
+      json: true,
+      body: {
+        apikey: key,
+        id: listId
+      }
+    }, function(err, response, body) {
+      if (err) {
+        return callback(err);
+      }
+
+      return callback(null, body.total);
+    });
   });
 }
 
