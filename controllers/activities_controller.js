@@ -64,7 +64,7 @@ function alertProduct(count, product, token, timestamp) {
   var date = new Date(timestamp);
   var month = MONTHS[date.getMonth()];
   var day = date.getDate();
-  var since = month + ' ' + date;
+  var since = month + ' ' + day;
   var message = 'There were ' + count + ' new signups since ' + since + '.';
 
   request({
