@@ -39,16 +39,17 @@ activities.route(route)
   var product = req.params.product;
   var token = req.query.token;
   var body = req.body;
+  var listId = body.data.list_id;
 
   Activity.create({
     product: product,
     webhook_id: body.data.id,
     type: body.data.email_type,
-    list_id: body.data.list_id,
+    list_id: listId,
     email: body.data.email
   })
   .then(function(activity) {
-    checkUpdates(product, token);
+    checkUpdates(product, token, listId);
     res.status(201).json(activity);
   })
   .catch(function(err) {
@@ -58,10 +59,10 @@ activities.route(route)
   });
 });
 
-function alertProduct(count, product, token, timestamp) {
+function alertProduct(count, product, token, timestamp, listId) {
   // Assembly-only
 
-  getTotalSubscribers(function(err, total) {
+  getTotalSubscribers(listId, function(err, total) {
     if (err) {
       console.log(err);
       return console.error('Error getting total subscirbers.');
@@ -127,19 +128,19 @@ function alertSubscribers(count, product, timestamp) {
   });
 }
 
-function checkUpdates(product, token) {
+function checkUpdates(product, token, listId) {
   Update.find({ product: product })
   .then(function(update) {
     var now = Date.now();
 
     if (!update) {
-      return countActivitiesSince(product, token);
+      return countActivitiesSince(product, token, null, listId);
     }
 
     if (now - update.get('sent_at') > ONE_DAY &&
         // don't check more than once per day
         now - update.get('checked_at') > ONE_DAY) {
-      countActivitiesSince(product, token, update);
+      countActivitiesSince(product, token, update, listId);
     }
   })
   .catch(function(error) {
@@ -148,7 +149,7 @@ function checkUpdates(product, token) {
   });
 }
 
-function countActivitiesSince(product, token, update) {
+function countActivitiesSince(product, token, update, listId) {
   if (!update) {
     update = Update.build({
       product: product,
@@ -165,7 +166,7 @@ function countActivitiesSince(product, token, update) {
     var now = new Date();
 
     if (count >= COUNT) {
-      alertProduct(count, product, token, timestamp);
+      alertProduct(count, product, token, timestamp, listId);
 
       return markUpdate(update, {
         sent_at: now,
@@ -196,39 +197,24 @@ function markUpdate(update, data) {
   });
 }
 
-function getTotalSubscribers(callback) {
+function getTotalSubscribers(listId, callback) {
   var uri = process.env.MAILCHIMP_API;
   var key = process.env.MAILCHIMP_API_KEY;
 
   request({
     method: 'POST',
-    uri: uri + '/lists/list',
+    uri: uri + '/lists/members',
     json: true,
     body: {
-      apikey: key
+      apikey: key,
+      id: listId
     }
   }, function(err, response, body) {
     if (err) {
       return callback(err);
     }
 
-    var listId = body.data[0].id;
-
-    request({
-      method: 'POST',
-      uri: uri + '/lists/members',
-      json: true,
-      body: {
-        apikey: key,
-        id: listId
-      }
-    }, function(err, response, body) {
-      if (err) {
-        return callback(err);
-      }
-
-      return callback(null, body.total);
-    });
+    return callback(null, body.total);
   });
 }
 
