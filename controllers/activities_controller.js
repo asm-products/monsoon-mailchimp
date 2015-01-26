@@ -1,7 +1,9 @@
-var express = require('express');
 var authorization = require('../middleware/authorization');
-var request = require('request');
+var express = require('express');
 var models = require('../models');
+var request = require('request');
+var util = require('util');
+
 var Activity = models.Activity;
 var Subscriber = models.Subscriber;
 var Update = models.Update;
@@ -68,13 +70,23 @@ function alertProduct(count, product, token, timestamp, listId) {
       return console.error('Error getting total subscirbers.');
     }
 
-    var endpoint = process.env.ASSEMBLY_API + '/products/' + product + '/updates?token=' + token;
+    var endpoint = util.format(
+      '%s/products/%s/updates?token=%s',
+      process.env.ASSEMBLY_API,
+      product,
+      token
+    );
+
     var date = new Date(timestamp);
     var month = MONTHS[date.getMonth()];
     var day = date.getDate();
     var since = month + ' ' + day;
-    var message = 'There were ' + count + ' new signups since ' + since +
-      '. There are now ' + total + ' subscribers.';
+    var message = util.format(
+      'There were %d new signups since %s. There are now %d subscribers.',
+      parseInt(count, 10),
+      since,
+      parseInt(total, 10)
+    );
 
     request({
       method: 'POST',

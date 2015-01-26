@@ -23,7 +23,7 @@ app.set('started', Date.now());
 app.get('/', function(req, res) {
   res.json({
     app: 'ASM Monsoon MailChimp Adapter',
-    version: '0.1.0',
+    version: '0.1.1',
     uptime: (Date.now() - app.get('started'))
   });
 });
